@@ -5,6 +5,7 @@ import {
 } from "@ledgerhq/coin-framework/bridge/jsHelpers";
 import { SignerContext } from "@ledgerhq/coin-framework/signer";
 import type { AccountBridge, CurrencyBridge } from "@ledgerhq/types-live";
+import { isEqual } from "lodash";
 import { broadcast } from "../broadcast";
 import { createTransaction } from "../createTransaction";
 import { estimateMaxSpendable } from "../estimateMaxSpendable";
@@ -21,7 +22,8 @@ const updateTransaction: AccountBridge<EvmTransaction>["updateTransaction"] = (
   transaction,
   patch,
 ) => {
-  return { ...transaction, ...patch } as EvmTransaction;
+  const newTransaction = { ...transaction, ...patch } as EvmTransaction;
+  return isEqual(transaction, newTransaction) ? transaction : newTransaction;
 };
 
 export function buildCurrencyBridge(

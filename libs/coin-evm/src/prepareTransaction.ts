@@ -6,6 +6,7 @@ import { validateRecipient } from "./getTransactionStatus";
 import { getAdditionalLayer2Fees, getEstimatedFees } from "./logic";
 import { getTransactionData, getTypedTransaction } from "./transaction";
 import { Transaction as EvmTransaction } from "./types";
+import { isEqual } from "lodash";
 
 /**
  * Prepare basic coin transactions or smart contract interactions (other than live ERC20 transfers)
@@ -140,9 +141,11 @@ export const prepareTransaction = async (
   const isTokenTransaction = subAccount?.type === "TokenAccount";
   const typedTransaction = getTypedTransaction(transaction, feeData);
 
-  return isTokenTransaction
+  const newTransaction = isTokenTransaction
     ? await prepareTokenTransaction(account, subAccount, typedTransaction)
     : await prepareCoinTransaction(account, typedTransaction);
+
+  return isEqual(transaction, newTransaction) ? transaction : newTransaction;
 };
 
 /**
