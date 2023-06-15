@@ -5,7 +5,7 @@ import { getFeesEstimation, getGasEstimation, getTransactionCount } from "./api/
 import { validateRecipient } from "./getTransactionStatus";
 import { getAdditionalLayer2Fees, getEstimatedFees } from "./logic";
 import { getTransactionData, getTypedTransaction } from "./transaction";
-import { Transaction as EvmTransaction } from "./types";
+import { Transaction as EvmTransaction, FeeData } from "./types";
 import { isEqual } from "lodash";
 
 /**
@@ -119,12 +119,13 @@ export const prepareTransaction = async (
 ): Promise<EvmTransaction> => {
   const { currency } = account;
   // Get the current network status fees
-  const feeData = await (async () => {
+  const feeData: FeeData = await (async () => {
     if (transaction.feesStrategy === "custom") {
       return {
         gasPrice: transaction.gasPrice ?? null,
         maxFeePerGas: transaction.maxFeePerGas ?? null,
         maxPriorityFeePerGas: transaction.maxPriorityFeePerGas ?? null,
+        nextBaseFee: transaction.gasOptions?.medium?.nextBaseFee ?? null,
       };
     }
 

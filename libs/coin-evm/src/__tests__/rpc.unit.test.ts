@@ -297,6 +297,7 @@ describe("EVM Family", () => {
         maxFeePerGas: new BigNumber("6000000014"),
         maxPriorityFeePerGas: new BigNumber("5999999988"),
         gasPrice: null,
+        nextBaseFee: new BigNumber("13"),
       });
     });
 
@@ -322,6 +323,7 @@ describe("EVM Family", () => {
         maxFeePerGas: new BigNumber("1000000026"),
         maxPriorityFeePerGas: new BigNumber(1e9),
         gasPrice: null,
+        nextBaseFee: new BigNumber("13"),
       });
     });
 
@@ -354,6 +356,7 @@ describe("EVM Family", () => {
         maxFeePerGas: null,
         maxPriorityFeePerGas: null,
         gasPrice: new BigNumber("666"),
+        nextBaseFee: null,
       });
     });
   });

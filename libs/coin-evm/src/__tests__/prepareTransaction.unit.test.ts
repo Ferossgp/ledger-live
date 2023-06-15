@@ -45,6 +45,7 @@ describe("EVM Family", () => {
         gasPrice: new BigNumber(1),
         maxFeePerGas: new BigNumber(1),
         maxPriorityFeePerGas: new BigNumber(1),
+        nextBaseFee: new BigNumber(1),
       }));
     });
 
@@ -112,6 +113,7 @@ describe("EVM Family", () => {
             gasPrice: new BigNumber(1),
             maxFeePerGas: null,
             maxPriorityFeePerGas: null,
+            nextBaseFee: null,
           }));
 
           const tx = await prepareTransaction(account, transaction);
@@ -305,6 +307,7 @@ describe("EVM Family", () => {
             gasPrice: new BigNumber(1),
             maxFeePerGas: null,
             maxPriorityFeePerGas: null,
+            nextBaseFee: null,
           }));
 
           const tokenAccountWithBalance = {
@@ -389,16 +392,19 @@ describe("EVM Family", () => {
             maxFeePerGas: new BigNumber(10),
             maxPriorityFeePerGas: new BigNumber(1),
             gasPrice: null,
+            nextBaseFee: new BigNumber(1),
           },
           medium: {
             maxFeePerGas: new BigNumber(20),
             maxPriorityFeePerGas: new BigNumber(2),
             gasPrice: null,
+            nextBaseFee: new BigNumber(1),
           },
           fast: {
             maxFeePerGas: new BigNumber(30),
             maxPriorityFeePerGas: new BigNumber(3),
             gasPrice: null,
+            nextBaseFee: new BigNumber(1),
           },
         };
         it("should use gasOptions values for fee data", async () => {
