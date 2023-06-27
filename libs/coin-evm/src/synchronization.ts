@@ -18,9 +18,9 @@ import { Account, Operation, SubAccount } from "@ledgerhq/types-live";
 import { decodeOperationId } from "@ledgerhq/coin-framework/operation";
 import { nftsFromOperations } from "@ledgerhq/coin-framework/nft/helpers";
 import { CryptoCurrency, TokenCurrency } from "@ledgerhq/types-cryptoassets";
-import { getBlockByHeight, getCoinBalance, getTokenBalance, getTransaction } from "./api/node/rpc";
 import { attachOperations, getSyncHash, mergeSubAccounts } from "./logic";
 import { getExplorerApi } from "./api/explorer";
+import { getNodeApi } from "./api/node/index";
 
 /**
  * Number of blocks that are considered "unsafe" due to a potential reorg.
@@ -34,11 +34,12 @@ export const SAFE_REORG_THRESHOLD = 80;
  */
 export const getAccountShape: GetAccountShape = async infos => {
   const { initialAccount, address, derivationMode, currency } = infos;
-  const [block, balance] = await Promise.all([
-    getBlockByHeight(currency, "latest"),
-    getCoinBalance(currency, address),
+  const rpcApi = getNodeApi(currency);
+  const [latestBlock, balance] = await Promise.all([
+    rpcApi.getBlockByHeight(currency, "latest"),
+    rpcApi.getCoinBalance(currency, address),
   ]);
-  const { height: blockHeight } = block;
+  const blockHeight = latestBlock.height;
   const accountId = encodeAccountId({
     type: "js",
     version: "2",
@@ -175,9 +176,10 @@ export const getSubAccountShape = async (
   token: TokenCurrency,
   operations: Operation[],
 ): Promise<Partial<SubAccount>> => {
+  const rpcApi = getNodeApi(currency);
   const { xpubOrAddress: address } = decodeAccountId(parentId);
   const tokenAccountId = encodeTokenAccountId(parentId, token);
-  const balance = await getTokenBalance(currency, address, token.contractAddress);
+  const balance = await rpcApi.getTokenBalance(currency, address, token.contractAddress);
 
   return {
     type: "TokenAccount",
@@ -203,13 +205,14 @@ export const getOperationStatus = async (
   op: Operation,
 ): Promise<Operation | null> => {
   try {
-    const { blockNumber: blockHeight, blockHash, nonce } = await getTransaction(currency, op.hash);
+    const rpcApi = getNodeApi(currency);
+    const { blockHeight, blockHash, nonce } = await rpcApi.getTransaction(currency, op.hash);
 
     if (!blockHeight) {
       throw new Error("getOperationStatus: Transaction has no block");
     }
 
-    const { timestamp } = await getBlockByHeight(currency, blockHeight);
+    const { timestamp } = await rpcApi.getBlockByHeight(currency, blockHeight);
     const date = new Date(timestamp * 1000);
 
     return {
