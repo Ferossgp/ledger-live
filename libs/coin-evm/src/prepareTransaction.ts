@@ -1,12 +1,12 @@
 import { findSubAccountById } from "@ledgerhq/coin-framework/account/index";
 import { Account, TokenAccount } from "@ledgerhq/types-live";
 import BigNumber from "bignumber.js";
+import { isEqual } from "lodash";
 import { getFeesEstimation, getGasEstimation, getTransactionCount } from "./api/rpc";
 import { validateRecipient } from "./getTransactionStatus";
 import { getAdditionalLayer2Fees, getEstimatedFees } from "./logic";
 import { getTransactionData, getTypedTransaction } from "./transaction";
 import { Transaction as EvmTransaction, FeeData } from "./types";
-import { isEqual } from "lodash";
 
 /**
  * Prepare basic coin transactions or smart contract interactions (other than live ERC20 transfers)
