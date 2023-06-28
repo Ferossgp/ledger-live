@@ -9,4 +9,4 @@
 "@ledgerhq/live-cli": minor
 ---
 
-Cosmos chains : stargaze, persistence, umee, secret network
+Cosmos chains : stargaze, desmos, umee, secret network
