@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { prepareForSignOperation, prepareTransaction } from "../../prepareTransaction";
-import * as rpcAPI from "../../api/rpc/rpc.common";
+import * as rpcAPI from "../../api/node/rpc.common";
 import {
   account,
   expectedData,

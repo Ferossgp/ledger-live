@@ -1,16 +1,27 @@
 import BigNumber from "bignumber.js";
+import { CryptoCurrency } from "@ledgerhq/types-cryptoassets";
 import { getCryptoCurrencyById, getTokenById } from "@ledgerhq/cryptoassets";
 import { makeAccount, makeTokenAccount } from "../fixtures/common.fixtures";
 import { EvmTransactionEIP1559, EvmTransactionLegacy } from "../../types";
 import { estimateMaxSpendable } from "../../estimateMaxSpendable";
-import * as rpcAPI from "../../api/rpc/rpc.common";
+import * as rpcAPI from "../../api/node/rpc.common";
 
+const currency: CryptoCurrency = {
+  ...getCryptoCurrencyById("ethereum"),
+  ethereumLikeInfo: {
+    ...getCryptoCurrencyById("ethereum").ethereumLikeInfo,
+    node: {
+      type: "external",
+      uri: "any-uri",
+    },
+  } as any,
+};
 const tokenAccount = {
   ...makeTokenAccount("0xkvn", getTokenById("ethereum/erc20/usd__coin")),
   balance: new BigNumber(6969),
 };
 const account = {
-  ...makeAccount("0xkvn", getCryptoCurrencyById("ethereum"), [tokenAccount]),
+  ...makeAccount("0xkvn", currency, [tokenAccount]),
   balance: new BigNumber(42069000000),
 };
 

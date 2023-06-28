@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
 import { transactionToEthersTransaction } from "../../adapters";
 import { Transaction as EvmTransaction } from "../../types";
-import * as rpcAPI from "../../api/rpc/rpc.common";
+import * as rpcAPI from "../../api/node/rpc.common";
 import {
   account,
   eip1559Tx,

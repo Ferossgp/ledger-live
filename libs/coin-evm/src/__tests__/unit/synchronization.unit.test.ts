@@ -5,9 +5,7 @@ import { AccountShapeInfo } from "@ledgerhq/coin-framework/bridge/jsHelpers";
 import { makeTokenAccount } from "../fixtures/common.fixtures";
 import * as etherscanAPI from "../../api/explorer/etherscan";
 import * as synchronization from "../../synchronization";
-import * as rpcAPI from "../../api/rpc/rpc.common";
-import { getEnv } from "../../../../env";
-import * as logic from "../../logic";
+import * as rpcAPI from "../../api/node/rpc.common";
 import {
   account,
   coinOperations,
@@ -20,8 +18,11 @@ import {
   tokenCurrencies,
   tokenOperations,
 } from "../fixtures/synchronization.fixtures";
+import { UnknownNode } from "../../errors";
+import { getEnv } from "../../../../env";
+import * as logic from "../../logic";
 
-jest.mock("../../api/rpc/rpc.common");
+jest.mock("../../api/node/rpc.common");
 jest.useFakeTimers().setSystemTime(new Date("2014-04-21"));
 
 const getAccountShapeParameters: AccountShapeInfo = {
@@ -37,19 +38,17 @@ describe("EVM Family", () => {
     describe("getAccountShape", () => {
       beforeEach(() => {
         // Mocking getAccount to prevent network calls
-        jest.spyOn(rpcAPI, "getBalanceAndBlock").mockImplementation(() =>
-          Promise.resolve({
-            blockHeight: 6969,
-            balance: new BigNumber(100),
-          }),
-        );
-        jest.spyOn(rpcAPI, "getSubAccount").mockImplementation(() =>
-          Promise.resolve({
-            blockHeight: 10,
-            balance: new BigNumber(100),
-            nonce: 1,
-          }),
-        );
+        jest.spyOn(rpcAPI, "getCoinBalance").mockImplementation(async () => new BigNumber(100));
+        jest.spyOn(rpcAPI, "getBlockByHeight").mockImplementation(async () => ({
+          hash: "blockHash6969",
+          height: 6969,
+          timestamp: Math.floor(Date.now() / 1000),
+        }));
+        jest.spyOn(rpcAPI, "getSubAccount").mockImplementation(async () => ({
+          blockHeight: 10,
+          balance: new BigNumber(100),
+          nonce: 1,
+        }));
       });
 
       afterAll(() => {
@@ -73,7 +72,7 @@ describe("EVM Family", () => {
           if (e instanceof AssertionError) {
             throw e;
           }
-          expect(e.message).toMatch("No explorer found for currency");
+          expect(e).toBeInstanceOf(UnknownNode);
         }
       });
 
@@ -100,7 +99,7 @@ describe("EVM Family", () => {
           if (e instanceof AssertionError) {
             throw e;
           }
-          expect(e.message).toMatch("No explorer found for currency");
+          expect(e).toBeInstanceOf(UnknownNode);
         }
       });
 
@@ -523,15 +522,13 @@ describe("EVM Family", () => {
       });
 
       it("should return the retrieved operation with network properties", async () => {
-        jest.spyOn(rpcAPI, "getTransaction").mockImplementationOnce(
-          async () =>
-            ({
-              blockNumber: 10,
-              blockHash: "hash",
-              timestamp: Date.now() / 1000,
-              nonce: 123,
-            } as any),
-        );
+        jest.spyOn(rpcAPI, "getTransaction").mockImplementationOnce(async () => ({
+          hash: "0xTransactionHash",
+          blockHeight: 10,
+          blockHash: "hash",
+          timestamp: Date.now() / 1000,
+          nonce: 123,
+        }));
 
         const expectedAddition = {
           blockHash: "hash",
@@ -545,6 +542,7 @@ describe("EVM Family", () => {
           subOperations: [tokenOperations[0]],
           nftOperations: [erc721Operations[0], erc1155Operations[0]],
         });
+
         expect(operationStatus).toEqual({
           ...coinOperations[0],
           ...expectedAddition,
@@ -562,16 +560,15 @@ describe("EVM Family", () => {
       });
 
       it("should return the retrieved operation with network properties even if the rpc doesn't return timestamp", async () => {
-        jest.spyOn(rpcAPI, "getTransaction").mockImplementationOnce(
-          async () =>
-            ({
-              blockNumber: 10,
-              blockHash: "hash",
-              nonce: 123,
-            } as any),
-        );
+        jest.spyOn(rpcAPI, "getTransaction").mockImplementationOnce(async () => ({
+          hash: "0xTransactionHash",
+          blockHeight: 10,
+          blockHash: "hash",
+          timestamp: Date.now() / 1000,
+          nonce: 123,
+        }));
         jest
-          .spyOn(rpcAPI, "getBlock")
+          .spyOn(rpcAPI, "getBlockByHeight")
           .mockImplementationOnce(async () => ({ timestamp: Date.now() / 1000 } as any));
 
         const expectedAddition = {

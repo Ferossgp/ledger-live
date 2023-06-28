@@ -4,7 +4,7 @@ import { TokenCurrency } from "@ledgerhq/types-cryptoassets";
 import * as cryptoAssetsTokens from "@ledgerhq/cryptoassets/tokens";
 import { getCryptoCurrencyById, getTokenById } from "@ledgerhq/cryptoassets";
 import { EvmTransactionEIP1559, EvmTransactionLegacy } from "../../types";
-import * as RPC_API from "../../api/rpc/rpc.common";
+import * as RPC_API from "../../api/node/rpc.common";
 import {
   deepFreeze,
   makeAccount,

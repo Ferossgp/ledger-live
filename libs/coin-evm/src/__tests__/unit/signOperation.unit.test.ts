@@ -7,14 +7,17 @@ import { buildSignOperation, applyEIP155 } from "../../signOperation";
 import { EvmAddress, EvmSignature, EvmSigner } from "../../signer";
 import { Transaction as EvmTransaction } from "../../types";
 import { makeAccount } from "../fixtures/common.fixtures";
-import * as rpcAPI from "../../api/rpc/rpc.common";
+import * as rpcAPI from "../../api/node/rpc.common";
 import { getEstimatedFees } from "../../logic";
 
 const currency: CryptoCurrency = {
   ...getCryptoCurrencyById("ethereum"),
   ethereumLikeInfo: {
     chainId: 1,
-    rpc: "my-rpc.com",
+    node: {
+      type: "external" as const,
+      uri: "my-rpc.com",
+    },
   },
 };
 const account: Account = makeAccount(
@@ -108,6 +111,8 @@ describe("EVM Family", () => {
               accountId: account.id,
               transactionSequenceNumber: 1,
               date: expect.any(Date),
+              subOperations: [],
+              nftOperations: [],
               extra: {},
             });
             expect(signature).toBe(
