@@ -16,13 +16,13 @@ import { prepareTransaction } from "../prepareTransaction";
 import { buildSignOperation } from "../signOperation";
 import { getAccountShape, sync } from "../synchronization";
 import { EvmAddress, EvmSignature, EvmSigner } from "../signer";
-import type { Transaction as EvmTransaction, Transaction } from "../types";
+import type { Transaction } from "../types";
 
-const updateTransaction: AccountBridge<EvmTransaction>["updateTransaction"] = (
+export const updateTransaction: AccountBridge<Transaction>["updateTransaction"] = (
   transaction,
   patch,
 ) => {
-  const newTransaction = { ...transaction, ...patch } as EvmTransaction;
+  const newTransaction = { ...transaction, ...patch } as Transaction;
   return isEqual(transaction, newTransaction) ? transaction : newTransaction;
 };
 
