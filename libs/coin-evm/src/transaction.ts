@@ -78,6 +78,10 @@ export const fromTransactionRaw = (rawTx: EvmTransactionRaw): EvmTransaction => 
     tx.additionalFees = new BigNumber(rawTx.additionalFees);
   }
 
+  if (rawTx.customGasLimit) {
+    tx.customGasLimit = new BigNumber(rawTx.customGasLimit);
+  }
+
   return tx as EvmTransaction;
 };
 
@@ -115,6 +119,10 @@ export const toTransactionRaw = (tx: EvmTransaction): EvmTransactionRaw => {
 
   if (tx.additionalFees) {
     txRaw.additionalFees = tx.additionalFees.toFixed();
+  }
+
+  if (tx.customGasLimit) {
+    txRaw.customGasLimit = tx.customGasLimit.toFixed();
   }
 
   return txRaw as EvmTransactionRaw;

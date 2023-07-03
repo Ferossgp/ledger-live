@@ -7,12 +7,13 @@ import {
   eip1559TransactionHasFees,
   getAdditionalLayer2Fees,
   getEstimatedFees,
+  getGasLimit,
   getSyncHash,
   legacyTransactionHasFees,
   mergeSubAccounts,
 } from "../logic";
 import { makeAccount, makeOperation, makeTokenAccount } from "../testUtils";
-import { EvmTransactionEIP1559, EvmTransactionLegacy } from "../types";
+import { EvmTransactionEIP1559, EvmTransactionLegacy, Transaction } from "../types";
 
 describe("EVM Family", () => {
   describe("logic.ts", () => {
@@ -91,17 +92,79 @@ describe("EVM Family", () => {
       });
     });
 
-    describe("getEstimatedFees", () => {
-      it("should return the right fee estimation for a legacy tx", () => {
-        const tx = {
-          type: 0,
-          gasLimit: new BigNumber(3),
-          gasPrice: new BigNumber(23),
-          maxFeePerGas: new BigNumber(100),
-          maxPriorityFeePerGas: new BigNumber(40),
+    describe("getGasLimit", () => {
+      it("should return the gasLimit when no customGasLimit provided", () => {
+        const tx: Partial<Transaction> = {
+          gasLimit: new BigNumber(100),
+          customGasLimit: undefined,
         };
 
-        expect(getEstimatedFees(tx as any)).toEqual(new BigNumber(69));
+        expect(getGasLimit(tx as any)).toEqual(new BigNumber(100));
+      });
+
+      it("should return the customGasLimit when provided", () => {
+        const tx: Partial<Transaction> = {
+          gasLimit: new BigNumber(100),
+          customGasLimit: new BigNumber(200),
+        };
+
+        expect(getGasLimit(tx as any)).toEqual(new BigNumber(200));
+      });
+    });
+
+    describe("getEstimatedFees", () => {
+      describe("without customGasLimit", () => {
+        it("should return the right fee estimation for a legacy tx", () => {
+          const tx = {
+            type: 0,
+            gasLimit: new BigNumber(3),
+            gasPrice: new BigNumber(23),
+            maxFeePerGas: new BigNumber(100),
+            maxPriorityFeePerGas: new BigNumber(40),
+          };
+
+          expect(getEstimatedFees(tx as any)).toEqual(new BigNumber(69));
+        });
+
+        it("should return the right fee estimation for a 1559 tx", () => {
+          const tx = {
+            type: 2,
+            gasLimit: new BigNumber(42),
+            gasPrice: new BigNumber(23),
+            maxFeePerGas: new BigNumber(10),
+            maxPriorityFeePerGas: new BigNumber(40),
+          };
+
+          expect(getEstimatedFees(tx as any)).toEqual(new BigNumber(420));
+        });
+      });
+
+      describe("with customGasLimit", () => {
+        it("should return the right fee estimation for a legacy tx", () => {
+          const tx = {
+            type: 0,
+            gasLimit: new BigNumber(4),
+            customGasLimit: new BigNumber(3),
+            gasPrice: new BigNumber(23),
+            maxFeePerGas: new BigNumber(100),
+            maxPriorityFeePerGas: new BigNumber(40),
+          };
+
+          expect(getEstimatedFees(tx as any)).toEqual(new BigNumber(69));
+        });
+
+        it("should return the right fee estimation for a 1559 tx", () => {
+          const tx = {
+            type: 2,
+            gasLimit: new BigNumber(43),
+            customGasLimit: new BigNumber(42),
+            gasPrice: new BigNumber(23),
+            maxFeePerGas: new BigNumber(10),
+            maxPriorityFeePerGas: new BigNumber(40),
+          };
+
+          expect(getEstimatedFees(tx as any)).toEqual(new BigNumber(420));
+        });
       });
 
       it("should fallback with tx without type", () => {
@@ -115,18 +178,6 @@ describe("EVM Family", () => {
         };
 
         expect(getEstimatedFees(tx as any)).toEqual(new BigNumber(0));
-      });
-
-      it("should return the right fee estimation for a 1559 tx", () => {
-        const tx = {
-          type: 2,
-          gasLimit: new BigNumber(42),
-          gasPrice: new BigNumber(23),
-          maxFeePerGas: new BigNumber(10),
-          maxPriorityFeePerGas: new BigNumber(40),
-        };
-
-        expect(getEstimatedFees(tx as any)).toEqual(new BigNumber(420));
       });
 
       it("should fallback with badly formatted 1559 tx", () => {

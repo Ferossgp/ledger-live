@@ -13,16 +13,19 @@ import {
   EtherscanOperation,
   EtherscanERC20Event,
 } from "./types";
+import { getGasLimit } from "./logic";
 
 /**
  * Adapter to convert a Ledger Live transaction to an Ethers transaction
  */
 export const transactionToEthersTransaction = (tx: EvmTransaction): ethers.Transaction => {
+  const gasLimit = getGasLimit(tx);
+
   const ethersTx = {
     to: tx.recipient,
     value: ethers.BigNumber.from(tx.amount.toFixed()),
     data: tx.data ? `0x${tx.data.toString("hex")}` : undefined,
-    gasLimit: ethers.BigNumber.from(tx.gasLimit.toFixed()),
+    gasLimit: ethers.BigNumber.from(gasLimit.toFixed()),
     nonce: tx.nonce,
     chainId: tx.chainId,
     type: tx.type,
