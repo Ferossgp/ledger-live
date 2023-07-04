@@ -22,6 +22,8 @@ import { ScrollView } from "react-native";
 import { Device } from "@ledgerhq/live-common/hw/actions/types";
 import { LanguagePrompt } from "./LanguagePrompt";
 import type { SyncOnboardingScreenProps } from ".";
+import { NavigatorName, ScreenName } from "../../const";
+import { StackNavigationProp } from "@react-navigation/stack";
 
 const LOCKED_DEVICE_TIMEOUT_MS = 1000;
 
@@ -68,7 +70,8 @@ export const EarlySecurityCheck: React.FC<EarlySecurityCheckProps> = ({
   device,
   notifyOnboardingEarlyCheckEnded,
 }) => {
-  const navigation = useNavigation<SyncOnboardingScreenProps["navigation"]>();
+  // const navigation = useNavigation<SyncOnboardingScreenProps["navigation"]>();
+  const navigation = useNavigation<StackNavigationProp<Record<string, object | undefined>>>();
   const { t } = useTranslation();
   const productName = getDeviceModel(device.modelId).productName || device.modelId;
 
@@ -170,7 +173,7 @@ export const EarlySecurityCheck: React.FC<EarlySecurityCheckProps> = ({
     navigation.navigate(NavigatorName.Manager, {
       screen: ScreenName.FirmwareUpdate,
       params: {
-        device: lastConnectedDevice,
+        device,
         deviceInfo: lastSeenDevice?.deviceInfo,
         firmwareUpdateContext: latestFirmware,
         onBackFromUpdate,
