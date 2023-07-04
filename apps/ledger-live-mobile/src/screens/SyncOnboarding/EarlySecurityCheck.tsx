@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
-import styled from "styled-components/native";
-import { Button, Flex, InfiniteLoader, Text, Link, ScrollListContainer } from "@ledgerhq/native-ui";
+import { Button, Flex, InfiniteLoader, Text, Link } from "@ledgerhq/native-ui";
 import UnlockDeviceDrawer from "./UnlockDeviceDrawer";
 import { FlexBoxProps } from "@ledgerhq/native-ui/components/Layout/Flex";
 import {
@@ -21,6 +21,7 @@ import FirmwareUpdateAvailableDrawer from "./FirmwareUpdateAvailableDrawer";
 import { ScrollView } from "react-native";
 import { Device } from "@ledgerhq/live-common/hw/actions/types";
 import { LanguagePrompt } from "./LanguagePrompt";
+import type { SyncOnboardingScreenProps } from ".";
 
 const LOCKED_DEVICE_TIMEOUT_MS = 1000;
 
@@ -67,6 +68,7 @@ export const EarlySecurityCheck: React.FC<EarlySecurityCheckProps> = ({
   device,
   notifyOnboardingEarlyCheckEnded,
 }) => {
+  const navigation = useNavigation<SyncOnboardingScreenProps["navigation"]>();
   const { t } = useTranslation();
   const productName = getDeviceModel(device.modelId).productName || device.modelId;
 
@@ -164,7 +166,16 @@ export const EarlySecurityCheck: React.FC<EarlySecurityCheckProps> = ({
     });
 
     // TODO: actual fw update: "updating"
-    setFirmwareUpdateCheckStatus("completed");
+    // setFirmwareUpdateCheckStatus("completed");
+    navigation.navigate(NavigatorName.Manager, {
+      screen: ScreenName.FirmwareUpdate,
+      params: {
+        device: lastConnectedDevice,
+        deviceInfo: lastSeenDevice?.deviceInfo,
+        firmwareUpdateContext: latestFirmware,
+        onBackFromUpdate,
+      },
+    });
   }, []);
 
   // Check steps entry points
@@ -564,10 +575,3 @@ const CheckCard = ({ title, description, index, status, ...props }: CheckCardPro
     </Flex>
   );
 };
-
-// const StyledScrollView = styled(ScrollView)`
-//   display: flex;
-//   flex: 1;
-//   height: 100%;
-//   background-color: "red";
-// `;
