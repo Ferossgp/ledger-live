@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import BigNumber from "bignumber.js";
-import { CryptoCurrency } from "@ledgerhq/types-cryptoassets";
+import { CryptoCurrency, Unit } from "@ledgerhq/types-cryptoassets";
 import { mergeOps } from "@ledgerhq/coin-framework/bridge/jsHelpers";
 import { Account, SubAccount } from "@ledgerhq/types-live";
 import { listTokensForCryptoCurrency } from "@ledgerhq/cryptoassets/tokens";
@@ -39,6 +39,12 @@ export const getEstimatedFees = (tx: EvmTransaction): BigNumber => {
   }
   return tx.maxFeePerGas?.multipliedBy(gasLimit) || new BigNumber(0);
 };
+
+/**
+ * Helper to get the currency unit to be used for the fee field
+ */
+export const getDefaultFeeUnit = (currency: CryptoCurrency): Unit =>
+  currency.units.length > 1 ? currency.units[1] : currency.units[0];
 
 /**
  * Helper returning the potential additional fees necessary for layer twos

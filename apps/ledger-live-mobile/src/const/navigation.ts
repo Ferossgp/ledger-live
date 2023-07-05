@@ -77,6 +77,8 @@ export enum ScreenName {
   EditDeviceName = "EditDeviceName",
   EthereumCustomFees = "EthereumCustomFees",
   EthereumEditGasLimit = "EthereumEditGasLimit",
+  EvmEditGasLimit = "EvmEditGasLimit",
+  EvmCustomFees = "EvmCustomFees",
   Exchange = "Exchange",
   ExchangeBuy = "ExchangeBuy",
   ExchangeHistory = "ExchangeHistory",
