@@ -77,6 +77,12 @@ export const defaultFeatures = {
   currencyPersistence: {
     enabled: false,
   },
+  depositNetworkBannerMobile: {
+    enabled: false,
+    params: {
+      url: "https://www.ledger.com/ledger-live",
+    },
+  },
   deviceInitialApps: {
     enabled: false,
     params: {
