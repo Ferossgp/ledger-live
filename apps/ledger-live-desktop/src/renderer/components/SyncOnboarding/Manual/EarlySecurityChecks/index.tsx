@@ -24,7 +24,7 @@ import UpdateFirmwareModal, {
 } from "~/renderer/modals/UpdateFirmwareModal";
 import { Device } from "@ledgerhq/live-common/hw/actions/types";
 import { initialStepId } from "~/renderer/screens/manager/FirmwareUpdate";
-import { useChangeLanguagePrompt } from "./ChangeLanguagePrompt";
+import { useChangeLanguagePrompt } from "./useChangeLanguagePrompt";
 
 const UIDelay = 2500;
 
