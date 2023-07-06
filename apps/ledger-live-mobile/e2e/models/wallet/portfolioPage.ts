@@ -1,7 +1,20 @@
-import { getElementById, openDeeplink, tapByElement, waitForElementByID } from "../../helpers";
+import {
+  getElementById,
+  getElementByText,
+  getTextOfElement,
+  openDeeplink,
+  scrollToId,
+  tapByElement,
+  waitForElementById,
+  waitForElementByText,
+} from "../../helpers";
 
 const baseLink = "portfolio";
 export default class PortfolioPage {
+  zeroBalance = "$0.00";
+  graphCardBalanceId = "graphCard-balance";
+  assetBalanceRegex = /asset-balance-[A-Z]+/i;
+  readOnlyPortfolioId = "PortfolioReadOnlyList";
   emptyPortfolioComponent = () => getElementById("PortfolioEmptyAccount");
   portfolioSettingsButton = () => getElementById("settings-icon");
   transferButton = () => getElementById("transfer-button");
@@ -20,7 +33,15 @@ export default class PortfolioPage {
   }
 
   async waitForPortfolioPageToLoad() {
-    await waitForElementByID("settings-icon");
+    await waitForElementById("settings-icon");
+  }
+
+  async waitForPortfolioReadOnly() {
+    await waitForElementById(this.readOnlyPortfolioId);
+    expect(await getTextOfElement(this.graphCardBalanceId)).toBe(this.zeroBalance);
+    await scrollToId(this.assetBalanceRegex, 4, this.readOnlyPortfolioId);
+    for (var index = 0; index < 4; index++)
+      expect(await getTextOfElement(this.assetBalanceRegex, index)).toBe(this.zeroBalance);
   }
 
   async openViaDeeplink() {

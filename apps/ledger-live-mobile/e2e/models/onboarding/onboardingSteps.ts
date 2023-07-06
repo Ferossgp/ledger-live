@@ -4,31 +4,48 @@ import {
   tapByElement,
   getElementById,
   waitForElementByText,
+  waitForElementById,
+  tapById,
 } from "../../helpers";
 import * as bridge from "../../bridge/server";
 
 export default class OnboardingSteps {
-  onboardingGetStartedButton = () => getElementByText("Get started");
-  setupLedgerButton = () => getElementByText("Set up your Ledger");
-  accessWalletButton = () => getElementByText("Access your wallet");
-  connectLedgerButton = () => getElementByText("Connect your Ledger");
-  continueButton = () => getElementByText("Continue");
-  pairNanoButton = () => getElementByText("Let’s pair my Nano"); // Yes it's a weird character, no do not replace it as it won't find the text
+  getStartedButtonId = "onboarding-getStarted-button";
+  devicePairedContinueButtonId = "onboarding-paired-continue";
+  onboardingGetStartedButton = () => getElementById(this.getStartedButtonId);
+  accessWalletButton = () =>
+    getElementById("Onboarding PostWelcome - Selection|Access an existing wallet");
+  noLedgerYetButton = () => getElementById("onboarding-noLedgerYet");
+  exploreAppButton = () => getElementById("onboarding-noLedgerYetModal-explore");
+  discoverLiveTitle = (index: number) => `onboarding-discoverLive-${index}-title`;
+  exploreWithoutDeviceButton = () => getElementById("discoverLive-exploreWithoutADevice");
+  connectLedgerButton = () => getElementById("Existing Wallet | Connect");
+  continueButton = () => getElementById(this.devicePairedContinueButtonId);
   pairDeviceButton = () => getElementById("pair-device");
+  pairNanoButton = () => getElementById("Onboarding-PairNewNano");
   nanoDeviceButton = (name = "") => getElementByText(`Nano X de ${name}`);
-  maybeLaterButton = () => getElementById("Maybe later");
+  maybeLaterButton = () => getElementById("notifications-prompt-later");
 
   async startOnboarding() {
-    await waitForElementByText("Get started");
+    await waitForElementById(this.getStartedButtonId);
     await tapByElement(this.onboardingGetStartedButton());
-  }
-
-  async chooseToSetupLedger() {
-    await tapByElement(this.setupLedgerButton());
   }
 
   async chooseToAccessYourWallet() {
     await tapByElement(this.accessWalletButton());
+  }
+
+  async chooseNoLedgerYet() {
+    await tapByElement(this.noLedgerYetButton());
+  }
+
+  async chooseToExploreApp() {
+    await tapByElement(this.exploreAppButton());
+  }
+
+  async chooseToExploreWithoutDevice() {
+    await waitForElementById(this.discoverLiveTitle(3));
+    await tapByElement(this.exploreWithoutDeviceButton());
   }
 
   async selectYourDevice(device: string) {
@@ -59,7 +76,7 @@ export default class OnboardingSteps {
   }
 
   async openLedgerLive() {
-    await waitForElementByText("Continue");
+    await waitForElementById(this.devicePairedContinueButtonId);
     await tapByElement(this.continueButton());
   }
 

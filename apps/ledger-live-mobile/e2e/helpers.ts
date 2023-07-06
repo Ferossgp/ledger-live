@@ -8,54 +8,42 @@ export const recipientParam = "&recipient=";
 export const amountParam = "&amount=";
 export const accountIdParam = "?accountId=";
 
-export function waitForElementByID(elementId: string, timeout?: number) {
-  return waitFor(element(by.id(elementId)))
-    .toBeVisible()
-    .withTimeout(timeout || DEFAULT_TIMEOUT);
+export function waitForElementById(id: string | RegExp, timeout: number = DEFAULT_TIMEOUT) {
+  return waitFor(getElementById(id)).toBeVisible().withTimeout(timeout);
 }
 
-export function waitForElementByText(text: string, timeout?: number) {
-  return waitFor(element(by.text(text)))
-    .toBeVisible()
-    .withTimeout(timeout || DEFAULT_TIMEOUT);
+export function waitForElementByText(text: string | RegExp, timeout: number = DEFAULT_TIMEOUT) {
+  return waitFor(getElementByText(text)).toBeVisible().withTimeout(timeout);
 }
 
-export function getElementById(id: string) {
-  return element(by.id(id));
+export function getElementById(id: string | RegExp, index: number = 0) {
+  return element(by.id(id)).atIndex(index);
 }
 
-export function getElementByText(text: string) {
-  return element(by.text(text));
+export function getElementByText(text: string | RegExp, index: number = 0) {
+  return element(by.text(text)).atIndex(index);
 }
 
-export function tapById(id: string, index?: number) {
-  return element(by.id(id))
-    .atIndex(index || 0)
-    .tap();
+export function tapById(id: string | RegExp) {
+  return getElementById(id).tap();
 }
 
-export function tapByText(text: string, index?: number) {
-  return element(by.text(text))
-    .atIndex(index || 0)
-    .tap();
+export function tapByText(text: string | RegExp) {
+  return getElementByText(text).tap();
 }
 
-export function tapByElement(elem: Detox.IndexableNativeElement, index = 0) {
-  return elem.atIndex(index || 0).tap();
+export function tapByElement(elem: Detox.NativeElement) {
+  return elem.tap();
 }
 
-export async function typeTextById(id: string, text: string, focus = true) {
+export async function typeTextById(id: string | RegExp, text: string, focus = true) {
   if (focus) {
     await tapById(id);
   }
   return getElementById(id).typeText(text);
 }
 
-export async function typeTextByElement(
-  elem: Detox.IndexableNativeElement,
-  text: string,
-  focus = true,
-) {
+export async function typeTextByElement(elem: Detox.NativeElement, text: string, focus = true) {
   if (focus) {
     await tapByElement(elem);
   }
@@ -63,20 +51,39 @@ export async function typeTextByElement(
   await elem.typeText(text);
 }
 
-export async function clearTextByElement(elem: Detox.IndexableNativeElement) {
+export async function clearTextByElement(elem: Detox.NativeElement) {
   return elem.clearText();
 }
 
 export async function scrollToText(
-  text: string,
-  scrollViewId: string,
+  text: string | RegExp,
+  index = 0,
+  scrollViewId: string | RegExp,
   pixels = 100,
   direction: Direction = "down",
 ) {
-  await waitFor(getElementByText(text))
+  await waitFor(getElementByText(text, index))
     .toBeVisible()
-    .whileElement(by.id(scrollViewId)) // where some is your ScrollView testID
+    .whileElement(by.id(scrollViewId))
     .scroll(pixels, direction);
+}
+
+export async function scrollToId(
+  id: string | RegExp,
+  index: number = 0,
+  scrollViewId: string | RegExp,
+  pixels = 100,
+  direction: Direction = "down",
+) {
+  await waitFor(getElementById(id, index))
+    .toBeVisible()
+    .whileElement(by.id(scrollViewId))
+    .scroll(pixels, direction, NaN, 0.8);
+}
+
+export async function getTextOfElement(id: string | RegExp, index: number = 0) {
+  let attributes = await getElementById(id, index).getAttributes();
+  return !("elements" in attributes) ? attributes.text : attributes.elements[index].text;
 }
 
 /**
