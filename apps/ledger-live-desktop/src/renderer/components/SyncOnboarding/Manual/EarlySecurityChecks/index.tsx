@@ -24,6 +24,12 @@ import UpdateFirmwareModal, {
 } from "~/renderer/modals/UpdateFirmwareModal";
 import { Device } from "@ledgerhq/live-common/hw/actions/types";
 import { initialStepId } from "~/renderer/screens/manager/FirmwareUpdate";
+import GenuineCheckErrorDrawer, {
+  Props as GenuineCheckErrorDrawerProps,
+} from "./GenuineCheckErrorDrawer";
+import DeviceNotGenuineDrawer, {
+  Props as DeviceNotGenuineDrawerProps,
+} from "./DeviceNotGenuineDrawer";
 import { useChangeLanguagePrompt } from "./useChangeLanguagePrompt";
 
 const UIDelay = 2500;
