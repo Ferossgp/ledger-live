@@ -1,11 +1,12 @@
 import { getCryptoCurrencyById, getTokenById } from "@ledgerhq/cryptoassets";
 import * as cryptoAssetsTokens from "@ledgerhq/cryptoassets/tokens";
-import { TokenCurrency } from "@ledgerhq/types-cryptoassets";
+import { CryptoCurrency, TokenCurrency, Unit } from "@ledgerhq/types-cryptoassets";
 import BigNumber from "bignumber.js";
 import * as RPC_API from "../api/rpc/rpc.common";
 import {
   eip1559TransactionHasFees,
   getAdditionalLayer2Fees,
+  getDefaultFeeUnit,
   getEstimatedFees,
   getGasLimit,
   getSyncHash,
@@ -186,6 +187,40 @@ describe("EVM Family", () => {
         };
 
         expect(getEstimatedFees(tx as any)).toEqual(new BigNumber(0));
+      });
+    });
+
+    describe("getDefaultFeeUnit", () => {
+      it("should return the unit when currency has only one", () => {
+        const expectedUnit: Unit = {
+          name: "name",
+          code: "code",
+          magnitude: 18,
+        };
+
+        const currency: Partial<CryptoCurrency> = {
+          units: [expectedUnit],
+        };
+
+        expect(getDefaultFeeUnit(currency as CryptoCurrency)).toEqual(expectedUnit);
+      });
+
+      it("should return the second unit when currency has multiple", () => {
+        const expectedUnit: Unit = {
+          name: "name",
+          code: "code",
+          magnitude: 18,
+        };
+
+        const currency: Partial<CryptoCurrency> = {
+          units: [
+            { ...expectedUnit, name: "unit0" },
+            expectedUnit,
+            { ...expectedUnit, name: "unit2" },
+          ],
+        };
+
+        expect(getDefaultFeeUnit(currency as CryptoCurrency)).toEqual(expectedUnit);
       });
     });
 
